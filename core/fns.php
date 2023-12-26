@@ -1,5 +1,31 @@
 <?php
+
+use function PHPSTORM_META\override;
+
 define("BASE_URI",  "/ytd/");
+
+
+$debug = false;
+
+function dkotak()
+{
+    global $debug;
+    if($debug)
+    {
+        call_user_func_array('dlimit', func_get_args());
+    }
+}
+
+function skotak()
+{
+    global $debug;
+    if($debug)
+    {
+        call_user_func_array('s', func_get_args());
+    }
+}
+
+
 
 
 if (!function_exists("dlimit")) {

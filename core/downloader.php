@@ -1,13 +1,15 @@
 <?php
 
+require_once 'fns.php';
+
 class YouTubeDownloader
 {
     private $videoUrl;
     private $chunks = [];
 
-    private function downloadUsingCurl($videoInfo, $isAudio = false)
+    public static function downloadUsingCurl($videoInfo, $isAudio = false)
     {
-        dlimit("start");
+        dkotak("start");
         set_time_limit(0);
 
         //This is the file where we save the    information
@@ -32,7 +34,7 @@ class YouTubeDownloader
         $len = $videoInfo->contentLength;
         $divide = 4;
         $chunkSize = floor($len / $divide);
-        s("Video length " . $len);
+        skotak("Video length " . $len);
         $start = -$chunkSize - 1;
         /////////
 
@@ -54,7 +56,7 @@ class YouTubeDownloader
             if ($isAudio) {
                 $name =  "audio-" . date(" m-i") . ".mp3";
             }
-            s([$name, $range,  $end - $start]);
+            skotak([$name, $range,  $end - $start]);
 
             //Here is the file we are downloading, replace spaces with %20
             $ch = curl_init($url);
@@ -78,8 +80,6 @@ class YouTubeDownloader
 
             curl_multi_add_handle($handle, $ch);
         }
-
-        echo '<hr/>';
         $callback = function ($data, $info, $i) {
             file_put_contents("downloads/data-$i.mp4", $data);
         };
@@ -94,9 +94,9 @@ class YouTubeDownloader
                 $info = curl_getinfo($state['handle']);
                 $data = curl_multi_getcontent($state['handle']);
                 //
-                dlimit($active);
-                s($i);
-                s(strlen($data));
+                dkotak($active);
+                skotak($i);
+                skotak(@strlen($data));
                 // $callback($data, $info, $active);
                 curl_multi_remove_handle($handle, $state['handle']);
             }
@@ -107,23 +107,14 @@ class YouTubeDownloader
 
         self::combineDownloads();
 
-        return;
-
-        ///////////////////////////////////////////////////////////////
-        // $ch = curl_init($url);
-        // $file = fopen("./downloads/full.mp4", "w+");
-        // // make sure to set timeout to a high enough value
-        // // if this is too low the download will be interrupted
-        // curl_setopt($ch, CURLOPT_TIMEOUT, 600);
-        // curl_setopt($ch, CURLOPT_FILE, $file);
-        // curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-        // // curl_setopt($ch, CURLOPT_RANGE, $range);
-        // ///////////////////////////
-        // curl_setopt($ch, CURLOPT_FRESH_CONNECT, true);
-        // curl_exec($ch);
+        self::downloadTheFile();
     }
 
-    private function combineDownloads()
+    public static function downloadTheFile() {
+        header("Location: ".BASE_URI."save.php");
+    }
+
+    public static function combineDownloads()
     {
         $filesArray = glob("downloads/*");
         sort($filesArray);
@@ -136,12 +127,28 @@ class YouTubeDownloader
         } else {
             $command = str_replace(["[commandName]", "\\"], ["cat", "/"], $command);
         }
-        s($command);
-        exit;
-        exec($command , $output, $result_code);
+        exec($command, $output, $result_code);
     }
 
-    private function joinFilesBySpace($filesArray)
+    public static function combineDownloads2()
+    {
+        $filesArray = glob("downloads/*");
+        sort($filesArray);
+
+
+        $command = "[commandName] ";
+        $command .= self::joinFilesBySpace($filesArray) . " > " . realpath("./downloads") . "\\download.mp4";
+        if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+            $command = str_replace(["[commandName]", "\\"], ["type", "\\"], $command);
+        } else {
+            $command = str_replace(["[commandName]", "\\"], ["cat", "/"], $command);
+        }
+        skotak($command);
+        exit;
+        exec($command, $output, $result_code);
+    }
+
+    public static function joinFilesBySpace($filesArray)
     {
         return join(" ", array_map(function ($file) {
             return realpath($file);
@@ -212,7 +219,7 @@ class YouTubeDownloader
 
 
         foreach ($formats as $format) {
-            // dlimit($format->audioQuality);
+            // dkotak($format->audioQuality);
             if ($format->hasBothAudioVideo) {
                 $both[] = $format;
             } else if ($format->hasVideo) {
@@ -233,12 +240,12 @@ class YouTubeDownloader
         if (!isset($videoInfo->contentLength) || $videoInfo->contentLength == 0) {
             $videoInfo->contentLength = curl_get_file_size($videoInfo->url);
         }
-        // delete_old();
+        delete_old();
 
         $start = time();
         $name = self::downloadUsingCurl($videoInfo);
         $end = time();
-        s($end - $start);
+        skotak($end - $start);
         exit;
     }
 
