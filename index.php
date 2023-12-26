@@ -1,27 +1,20 @@
 <?php
-require_once "core/fns.php";
-require_once "core/downloader.php";
 
+$files = glob("./*");
 
-
-include "components/header.php";
-?>
-
-<form method="get" action="select.php" class="formSmall">
-    <div class="row">
-        <div class="col-lg-12">
-            <h7 class="text-align"> Download YouTube Video</h7>
-        </div>
-        <div class="col-lg-12">
-            <div class="input-group">
-                <input value="https://www.youtube.com/watch?v=WO2b03Zdu4Q" type="text" class="form-control" name="video_link" placeholder="Paste link.. e.g. https://www.youtube.com/watch?v=5cpIZ8zHHXw">
-                <span class="input-group-btn">
-                    <button type="submit" name="submit" id="submit" class="btn btn-primary">Go!</button>
-                </span>
-            </div><!-- /input-group -->
-        </div>
-    </div><!-- .row -->
-</form>
-<?php
-include "components/footer.php";
-?>
+echo '<ul>';
+foreach($files as $file)
+{
+    if(is_dir($file))
+    {
+        echo "<li> ".'<svg style="width: 20px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <rect x="2" y="4" width="20" height="16" rx="2" ry="2"></rect>
+  <line x1="8" y1="2" x2="8" y2="6"></line>
+  <line x1="16" y1="2" x2="16" y2="6"></line>
+  <line x1="12" y1="2" x2="12" y2="6"></line>
+</svg>'." <a href='$file'>$file</a> </li>";
+    }else{
+        echo "<li> <a href='$file'>$file</a> </li>";    
+    }
+    
+}

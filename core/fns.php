@@ -1,6 +1,5 @@
 <?php
 
-use function PHPSTORM_META\override;
 
 define("BASE_URI",  "/ytd/");
 
