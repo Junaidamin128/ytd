@@ -4,13 +4,12 @@
 define("BASE_URI",  "/ytd/");
 
 
-$debug = false;
+$debug = true;
 
 function dkotak()
 {
     global $debug;
-    if($debug)
-    {
+    if ($debug) {
         call_user_func_array('dlimit', func_get_args());
     }
 }
@@ -18,8 +17,7 @@ function dkotak()
 function skotak()
 {
     global $debug;
-    if($debug)
-    {
+    if ($debug) {
         call_user_func_array('s', func_get_args());
     }
 }
@@ -122,9 +120,8 @@ function renderCards($formats, $cardHeader = "", $url = "", $title = "")
                 <tr>
                     <h2 href="<?php echo $url; ?>"><?= $title; ?></h2>
                 </tr>
-                <?php foreach ($formats as $format) : ?>
-                    <?php
-
+                <?php foreach ($formats as $format) :
+                    $format->customTitle = $title;
                     if (@$format->url == "") {
                         $signature = "https://example.com?" . $format->signatureCipher;
                         parse_str(parse_url($signature, PHP_URL_QUERY), $parse_signature);
@@ -148,8 +145,9 @@ function renderCards($formats, $cardHeader = "", $url = "", $title = "")
                         </td>
                         <td>
                             <form method="post" action="<?= BASE_URI; ?>download.php">
-                                <textarea name="video-info"><?= json_encode($format) ?></textarea>
+                                <textarea hidden name="video-info"><?= json_encode($format) ?></textarea>
                                 <button>Download</button>
+                                <textarea>./aria2c.exe -k1024K -x5 -s5 --out="<?= $format->qualityLabel2 ?>-download.mp4" "<?= $format->url ?>"</textarea>
                             </form>
 
                         </td>
@@ -159,4 +157,10 @@ function renderCards($formats, $cardHeader = "", $url = "", $title = "")
         </div>
     </div>
 <?php
+}
+
+
+function dText($text)
+{
+    echo "<textarea>$text</textarea>";
 }

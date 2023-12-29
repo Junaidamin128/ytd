@@ -12,10 +12,7 @@ class YouTubeDownloader
         dkotak("start");
         set_time_limit(0);
 
-        //This is the file where we save the    information
-        if (!file_exists(realpath("./") . "/downloads")) {
-            mkdir(realpath("./") . "/downloads");
-        }
+
 
 
 
@@ -27,9 +24,6 @@ class YouTubeDownloader
         /////////
         $url = $videoInfo->url;
         $url = str_replace(" ", "%20", $url);
-
-
-        // exit;
 
         $len = $videoInfo->contentLength;
         $divide = 4;
@@ -110,8 +104,9 @@ class YouTubeDownloader
         self::downloadTheFile();
     }
 
-    public static function downloadTheFile() {
-        header("Location: ".BASE_URI."save.php");
+    public static function downloadTheFile()
+    {
+        header("Location: " . BASE_URI . "save.php");
     }
 
     public static function combineDownloads()
@@ -242,11 +237,31 @@ class YouTubeDownloader
         }
         delete_old();
 
+        //This is the file where we save the    information
+        if (!file_exists(realpath("./") . "/downloads")) {
+            mkdir(realpath("./") . "/downloads");
+        }
+
         $start = time();
-        $name = self::downloadUsingCurl($videoInfo);
+        // $name = self::downloadUsingCurl($videoInfo);
+        $name = self::downloadUsingAria2c($videoInfo);
         $end = time();
         skotak($end - $start);
         exit;
+    }
+
+    public static function downloadUsingAria2c($videoInfo)
+    {
+        $url = $videoInfo->url;
+        $url = str_replace(" ", "%20", $url);
+        $aria2cPath = realpath(__DIR__ . "/../3rd/aria2c.exe");
+        // $savePath = realpath(__DIR__ . "/../downloads");
+        $savePath = "downloads/";
+        $savePath .= substr($videoInfo->customTitle, 0, 10) . "-" . $videoInfo->qualityLabel . ".mp4";
+        $command = "$aria2cPath -k1024K -x5 -s5 --out=\"$savePath\" \"$url\"";
+        dText($command);
+        $o = shell_exec($command);
+        s($o);
     }
 
 
