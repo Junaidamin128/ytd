@@ -1,7 +1,7 @@
 <?php
 
 $files = glob("./*");
-
+ 
 echo '<ul>';
 foreach($files as $file)
 {
